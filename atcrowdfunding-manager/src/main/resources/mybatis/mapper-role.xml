@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.atcrowdfunding.dao.RoleDao">
+
+<select id="pageQueryData" resultType="com.atguigu.atcrowdfunding.bean.Role">
+        select
+            *
+        from t_role
+        <where>
+            <if test="queryText != null">
+            and name like concat('%', #{queryText}, '%')
+            </if>
+        </where>
+        limit #{start}, #{size}
+    </select>
+    
+    <select id="pageQueryCount" resultType="int">
+        select
+            count(*)
+        from t_role
+        <where>
+            <if test="queryText != null">
+            and name like concat('%', #{queryText}, '%')
+            </if>
+        </where>
+    </select>
+    
+    <!--新增加的 void insertRolePermission(Map<String, Object> paramMap); -->
+    <insert id="insertRolePermission">
+    	insert into t_role_permission(roleid,permissionid) values
+    	<foreach collection="permissionids" item="permissionid" separator=",">
+	    	(#{roleid},#{permissionid})
+    	</foreach>
+    </insert>
+    
+    <!--删除角色表之前存在的 void deleteRolePermission(Map<String, Object> paramMap); -->
+	<delete id="deleteRolePermission">
+		delete from t_role_permission where roleid = #{roleid};
+	</delete>
+
+	<!--修改角色信息 void queryAndUpdate(Role role);  -->
+	<update id="queryAndUpdate">
+		UPDATE t_role SET name = #{name} where id = #{id};
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.atcrowdfunding.dao.UserDao">
+
+<!-- 模糊查询以及分页	List<User> pageQueryDate(Map<String, Object> map); -->
+<select id="pageQueryDate" resultType="com.atguigu.atcrowdfunding.bean.User">
+	select * from t_user 
+	<where>
+		<if test="queryText != null">
+			and loginacct like concat('%',#{queryText},'%')
+		</if>
+	</where>
+	order by createtime desc
+	limit #{start},#{size}
+</select>
+
+<!-- 查询数量 int PageQueryCount(Map<String, Object> map); -->
+<select id="PageQueryCount" resultType="int">
+	select count(*) from t_user
+	<where>
+		<if test="queryText != null">
+			and loginacct like concat('%',#{queryText},'%')
+		</if>
+	</where>
+</select>
+
+<!--新增 void insertUser(User user); -->
+<insert id="insertUser">
+	insert into t_user (
+            loginacct, username, userpswd, email,createtime
+        ) values (
+            #{loginacct}, #{username}, #{userpswd}, #{email},#{createtime}
+        )
+</insert>
+
+<!--修改 void updateUser(User user); -->
+<update id="updateUser">
+	update t_user 
+	<set>
+		username = #{username},loginacct=#{loginacct},email=#{email}
+	</set>
+	<where>
+		id = #{id}
+	</where>
+</update>
+
+<!--根据ID删除 void deleteUser(Integer id); -->		
+<delete id="deleteUser">
+	delete from t_user where id = #{id}
+</delete>
+
+<!--删除复选框的信息 void deletesUser(Integer[] userid); -->
+<delete id="deletesUser">
+	delete from t_user where id in
+	<foreach collection="userids" item="userid" open="(" close=")" separator=",">
+		#{userid}
+	</foreach>
+</delete>
+
+<!--
+void deleteUserRoles(@Param("userids")Integer userid, @Param("roleids")Integer[] assignroleids);
+void insertUserRoles(@Param("userids")Integer userid, @Param("roleids")Integer[] unassignroleids);
+void insertUserRoles(Map<String, Object> map);
+  -->
+ <insert id="insertUserRoles">
+        insert into t_user_role ( userid, roleid ) values 
+        <foreach collection="roleids" item="roleid" separator=",">
+        ( #{userid}, #{roleid} )
+        </foreach>
+</insert>
+
+
+<!-- void deleteUserRoles(Map<String, Object> map); -->
+<delete id="deleteUserRoles">
+        delete from t_user_role where userid = #{userid} and roleid in 
+        <foreach collection="roleids" item="roleid" open="(" close=")" separator=",">
+        	#{roleid}
+        </foreach>
+</delete>
+
+</mapper>

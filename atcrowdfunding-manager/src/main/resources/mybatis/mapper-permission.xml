@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.atcrowdfunding.dao.PermissionDao">
+
+<!-- void insert(Permission permission); -->
+<insert id="insert">
+	insert into t_permission(name,url,pid) values (#{name},#{url},#{pid})
+</insert>
+
+<!-- void update(Permission permission); -->
+<update id="update">
+	update t_permission 
+	<set>
+		name = #{name},url = #{url}
+	</set>
+	<where>
+		id = #{id}
+	</where>
+</update>
+
+<!-- void delete(Integer id); -->
+<delete id="delete">
+	delete from t_permission where id = #{id}
+</delete>
+
+
+<!-- List<Permission> queryPermissionsByUser(User dbUser); -->
+<select id="queryPermissionsByUser" resultType="com.atguigu.atcrowdfunding.bean.Permission">
+	SELECT * FROM t_permission where id IN(
+	SELECT permissionid FROM t_role_permission WHERE roleid in(
+		SELECT roleid FROM t_user_role WHERE userid = #{id}
+	)
+)
+</select>
+
+
+</mapper>
